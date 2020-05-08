@@ -65,7 +65,7 @@ void WINAPI serviceMain(int argc, char** argv) {
 	trace << "Current directory is " << directory << std::endl;
 
 	std::ifstream in;
-	in.open("wuji.cfg", std::ios::in);
+	in.open("application.json", std::ios::in);
 	if (!in.is_open()) {
 		trace << "Failed to open config file." << std::endl;
 		serviceStatus.dwCurrentState = SERVICE_STOPPED;

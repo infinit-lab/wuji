@@ -95,10 +95,10 @@ void CProcessManager::createProcess(CProcess* process) {
 			}
 			else {
 				DWORD error = GetLastError();
-				trace << "Failed to CreateProcess. error: " << error << std::endl;
+				trace << "Failed to CreateProcess " << process->param.path << ". error: " << error << std::endl;
 			}
 		}
-		trace << process->param.path << " Quit.";
+		trace << process->param.path << " Quit." << std::endl;
 		process->isStarted = false;
 	}).detach();
 }
