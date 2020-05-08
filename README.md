@@ -6,14 +6,16 @@
 - IDE: VS 2019
 
 ## 配置文件
+
 - 文件名：application.json
 - 文件内容：
-```json
+
+```json5
 [
   {
-    "path": "string", //exe路径
-    "param": "string", //启动参数
-    "dir": "string" //工作目录
+    "path":  "string",  //exe路径
+    "param": "string",  //启动参数
+    "dir":   "string"   //工作目录
   }
 ]
 ```
