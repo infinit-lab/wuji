@@ -1,6 +1,9 @@
 #include "process_manager.h"
 #include <Windows.h>
 #include <thread>
+#include <fstream>
+
+extern std::ofstream trace;
 
 CProcessManager* CProcessManager::m_instance = nullptr;
 
@@ -39,6 +42,7 @@ bool CProcessManager::run(const std::list<CProcessParam>& paramList) {
 	for (auto it = m_processList.begin(); it != m_processList.end(); it++) {
 		createProcess(*it);
 	}
+	return true;
 }
 
 void CProcessManager::stop() {
@@ -58,6 +62,11 @@ void CProcessManager::stop() {
 		}
 		break;
 	}
+
+	for (auto it = m_processList.begin(); it != m_processList.end(); it++) {
+		delete *it;
+	}
+	m_processList.clear();
 }
 
 void CProcessManager::createProcess(CProcess* process) {
@@ -68,18 +77,28 @@ void CProcessManager::createProcess(CProcess* process) {
 			STARTUPINFO si = { 0 };
 			PROCESS_INFORMATION pi = { 0 };
 			si.cb = sizeof(STARTUPINFO);
+			trace << "path is " << process->param.path;
+			trace << " param is " << process->param.param;
+			trace << " dir is " << process->param.dir << std::endl;
 			BOOL ret = CreateProcess(process->param.path.data(), (char*)process->param.param.data()
 				, NULL, NULL, FALSE, CREATE_SUSPENDED | CREATE_NO_WINDOW, NULL, process->param.dir.data(), &si, &pi);
 			if (ret) {
+				trace << "Success to CreateProcess. " << process->param.path << std::endl;
 				process->process = pi.hProcess;
 				process->thread = pi.hThread;
+				ResumeThread(process->thread);
 				WaitForSingleObject(process->process, INFINITE);
 				CloseHandle(process->thread);
 				CloseHandle(process->process);
 				process->thread = INVALID_HANDLE_VALUE;
 				process->process = INVALID_HANDLE_VALUE;
 			}
+			else {
+				DWORD error = GetLastError();
+				trace << "Failed to CreateProcess. error: " << error << std::endl;
+			}
 		}
+		trace << process->param.path << " Quit.";
 		process->isStarted = false;
 	}).detach();
 }
